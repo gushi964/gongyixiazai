@@ -95,6 +95,33 @@
   .cat:hover{border-color:var(--primary);color:var(--primary)}
   .cat.on{background:var(--primary);border-color:var(--primary);color:#fff}
   .cat.on small{color:#d6e7ff}
+  /* ===== 英雄联盟封禁查询工具 ===== */
+  .tool{max-width:1080px;margin:20px auto 0;padding:0 18px}
+  .tool-inner{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .tool-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .tool-head h2{font-size:18px;font-weight:700;letter-spacing:.3px}
+  .tool-head h2::before{content:"";display:inline-block;width:5px;height:16px;border-radius:2px;background:var(--primary);margin-right:9px;vertical-align:-2px}
+  .tool-head span{font-size:12px;color:var(--muted)}
+  .tool-row{display:flex;gap:10px;flex-wrap:wrap}
+  .tool-row input{
+    flex:1;min-width:200px;padding:11px 14px;border:1px solid var(--line);border-radius:10px;
+    font-size:16px;background:var(--input-bg);color:var(--ink);outline:none;transition:border .15s,background .15s;
+  }
+  .tool-row input:focus{border-color:var(--primary);background:var(--input-focus)}
+  #banBtn{
+    flex:0 0 auto;padding:11px 20px;border:none;border-radius:10px;background:var(--primary);color:#fff;
+    font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;
+  }
+  #banBtn:hover{background:var(--primary-strong)}
+  #banBtn:disabled{opacity:.6;cursor:not-allowed}
+  .tool-tip{font-size:12px;color:var(--muted);margin-top:10px}
+  .ban-result{margin-top:14px}
+  .ban-result .box{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--input-bg);font-size:14px;line-height:1.8}
+  .ban-result .box b{color:var(--primary)}
+  .ban-result .err{color:#e8453c}
+  .ban-result .ok{color:#16a34a}
+  .ban-result .pending{color:var(--muted)}
+  @media (min-width:560px){.tool-inner{padding:22px}}
   /* ===== 内容 ===== */
   main{max-width:1080px;margin:0 auto;padding:8px 18px 60px}
   .sec{margin-top:30px;scroll-margin-top:118px}
@@ -171,6 +198,21 @@
   <nav class="cats" id="cats"></nav>
 </header>
 
+<section class="tool">
+  <div class="tool-inner">
+    <div class="tool-head">
+      <h2>英雄联盟封禁查询</h2>
+      <span>输入QQ号查询账号封禁状态 · 数据来源 yun.4png.com</span>
+    </div>
+    <div class="tool-row">
+      <input id="banQq" type="text" inputmode="numeric" placeholder="请输入要查询的QQ号" autocomplete="off">
+      <button id="banBtn">查询封禁状态</button>
+    </div>
+    <div class="tool-tip">数据仅供参考，具体以官方查询结果为准</div>
+    <div class="ban-result" id="banResult"></div>
+  </div>
+</section>
+
 <main id="main"></main>
 
 <footer>资源来自永硕E盘「公益下载站」镜像整理 · 点击各资源的下载按钮即跳转到对应页面 · <a href="#top">返回顶部</a></footer>
@@ -197,7 +239,7 @@
     document.addEventListener("contextmenu",function(e){e.preventDefault();});
     document.addEventListener("copy",function(e){e.preventDefault();});
     document.addEventListener("cut",function(e){e.preventDefault();});
-    document.addEventListener("selectstart",function(e){e.preventDefault();});
+    document.addEventListener("selectstart",function(e){var t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;e.preventDefault();});
     document.addEventListener("keydown",function(e){
       var k=e.key||"";
       if(k==="F12" || (e.ctrlKey && /[uUsSiIjJcC]/.test(k)) || (e.ctrlKey&&e.shiftKey&&/[iIjJ]/.test(k))){
@@ -294,6 +336,54 @@
     state.kw = e.target.value.trim().toLowerCase();
     renderMain();
   });
+
+  /* ===== 英雄联盟封禁查询 ===== */
+  /* 接口：https://yun.4png.com/api/query.html?qq=<QQ>&token=<TOKEN>
+     需在 yun.4png.com 注册获取有效 token 后填入下方 LOL_TOKEN，才能返回查询结果。 */
+  var LOL_TOKEN = "__请在此填写你的yun.4png.com有效token__";
+  var __banBtn = document.getElementById("banBtn");
+  var __banQq = document.getElementById("banQq");
+  var __banRes = document.getElementById("banResult");
+  function __banShow(html){ if(__banRes) __banRes.innerHTML = html; }
+  function __banFields(j){
+    var box = '<div class="box ok"><b>查询结果：</b><br>';
+    for(var k in j){
+      if(k==="code" || k==="msg") continue;
+      var v = j[k];
+      if(v===null || v===undefined || v==="") continue;
+      box += '<div>'+esc(k)+'：'+(typeof v==="object"?JSON.stringify(v):esc(v))+'</div>';
+    }
+    box += '</div>';
+    return box;
+  }
+  if(__banBtn){
+    __banBtn.addEventListener("click", function(){
+      var qq = (__banQq.value||"").trim();
+      if(!qq){ __banShow('<div class="box err">请输入要查询的QQ号</div>'); return; }
+      if(LOL_TOKEN.indexOf("__")===0 || LOL_TOKEN.indexOf("请在此填写")>=0){
+        __banShow('<div class="box err">尚未配置查询 token。需先在 yun.4png.com 注册获取有效 token，填入网站后才能查询。拿到 token 后告诉我，我帮你配置。</div>');
+        return;
+      }
+      __banShow('<div class="box pending">正在查询，请稍候…</div>');
+      __banBtn.disabled = true;
+      fetch("https://yun.4png.com/api/query.html?qq="+encodeURIComponent(qq)+"&token="+encodeURIComponent(LOL_TOKEN))
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          __banBtn.disabled = false;
+          var code = j && j.code;
+          if(code===200 || code===0 || code===1){
+            __banShow(__banFields(j||{}));
+          }else{
+            __banShow('<div class="box err">'+(j&&j.msg?esc(j.msg):("查询失败（code "+code+"）"))+'</div>');
+          }
+        })
+        .catch(function(){
+          __banBtn.disabled = false;
+          __banShow('<div class="box err">网络请求失败，请稍后重试。</div>');
+        });
+    });
+    __banQq.addEventListener("keydown", function(e){ if(e.key==="Enter") __banBtn.click(); });
+  }
 
   renderCats();
   renderMain();
