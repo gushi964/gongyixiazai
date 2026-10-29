@@ -340,19 +340,20 @@
   /* ===== 英雄联盟封禁查询 ===== */
   /* 接口：https://yun.4png.com/api/query.html?qq=<QQ>&token=<TOKEN>
      需在 yun.4png.com 注册获取有效 token 后填入下方 LOL_TOKEN，才能返回查询结果。 */
-  var LOL_TOKEN = "__请在此填写你的yun.4png.com有效token__";
+  var LOL_TOKEN = "a76ade275bdea9ea";
   var __banBtn = document.getElementById("banBtn");
   var __banQq = document.getElementById("banQq");
   var __banRes = document.getElementById("banResult");
   function __banShow(html){ if(__banRes) __banRes.innerHTML = html; }
   function __banFields(j){
-    var box = '<div class="box ok"><b>查询结果：</b><br>';
-    for(var k in j){
-      if(k==="code" || k==="msg") continue;
-      var v = j[k];
-      if(v===null || v===undefined || v==="") continue;
-      box += '<div>'+esc(k)+'：'+(typeof v==="object"?JSON.stringify(v):esc(v))+'</div>';
-    }
+    var d = j.data || {};
+    var status = d["return"] || "";
+    var msg = j.msg || d.rammsg || "";
+    var good = /正常|无封禁|ok|可正常/i.test(status + " " + msg);
+    var box = '<div class="box '+(good?"ok":"err")+'"><b>查询结果（QQ：'+(j.name||"")+'）</b><br>';
+    if(status) box += '<div>封禁状态：'+esc(status)+'</div>';
+    if(d.rammsg) box += '<div>'+esc(d.rammsg)+'</div>';
+    if(msg && msg!==d.rammsg) box += '<div>'+esc(msg)+'</div>';
     box += '</div>';
     return box;
   }
