@@ -18,7 +18,11 @@
     --input-focus:#ffffff;
     --card-shadow:0 6px 18px rgba(15,111,222,.08);
     --mark-a:#1683f2; --mark-b:#0f6fde;
+    --container:1280px;
   }
+  @media (min-width:1600px){ :root{ --container:1440px; } }
+  @media (min-width:1900px){ :root{ --container:1720px; } }
+  @media (min-width:2300px){ :root{ --container:2100px; } }
   html[data-theme="dark"]{
     --bg:#0e1520;
     --surface:#17212e;
@@ -49,7 +53,7 @@
     border-bottom:1px solid var(--line);box-shadow:0 1px 4px rgba(20,40,80,.04);
   }
   .top-inner{
-    max-width:1080px;margin:0 auto;padding:14px 18px;
+    max-width:var(--container);margin:0 auto;padding:14px 18px;
     display:flex;align-items:center;gap:18px;flex-wrap:wrap;
   }
   .brand{display:flex;align-items:center;gap:11px;min-width:0}
@@ -85,7 +89,7 @@
   html[data-theme="dark"] .theme-btn .ic-moon{opacity:0;transform:scale(.5)}
   /* ===== 分类导航 ===== */
   .cats{
-    max-width:1080px;margin:0 auto;padding:10px 18px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;
+    max-width:var(--container);margin:0 auto;padding:10px 18px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;
   }
   .cat{
     flex:0 0 auto;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
@@ -96,7 +100,7 @@
   .cat.on{background:var(--primary);border-color:var(--primary);color:#fff}
   .cat.on small{color:#d6e7ff}
   /* ===== 内容 ===== */
-  main{max-width:1080px;margin:0 auto;padding:8px 18px 60px}
+  main{max-width:var(--container);margin:0 auto;padding:8px 18px 60px}
   .sec{margin-top:30px;scroll-margin-top:118px}
   .sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
   .sec-head h2{font-size:20px;font-weight:700;letter-spacing:.3px}
@@ -138,6 +142,18 @@
   }
   @media (min-width:900px){
     .grid{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (min-width:1200px){
+    .grid{grid-template-columns:repeat(4,1fr)}
+  }
+  @media (min-width:1600px){
+    .grid{grid-template-columns:repeat(5,1fr)}
+  }
+  @media (min-width:1900px){
+    .grid{grid-template-columns:repeat(6,1fr)}
+  }
+  @media (min-width:2300px){
+    .grid{grid-template-columns:repeat(7,1fr)}
   }
 </style>
 </head>
